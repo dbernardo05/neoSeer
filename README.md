@@ -8,13 +8,14 @@ Deep‑learning code, configs, and utilities for our paper&nbsp;⬇️
 
 ---
 
-## ✨ Significance
-Neonatal seizures carry high morbidity, yet existing ML approaches provide *static* risk scores spanning hours to days.  
-We instead tackle *minute‑scale* (“short‑horizon”) prediction using quantitative EEG and state‑of‑the‑art time‑series DL, achieving AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑alarm rates.
+## Significance
+Neonatal seizures carry high morbidity. Existing seizure prediction approaches provide *static* risk scores spanning hours to days.  
+We tackle *static,* *minute‑scale* (“short‑horizon”) seizure prediction using quantitative EEG and DL.
+We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑alarm rates.
 
 ---
 
-## 🔍 Repository highlights
+## Repo highlights
 
 | Folder / file | What it contains |
 |---------------|------------------|
@@ -31,7 +32,7 @@ We instead tackle *minute‑scale* (“short‑horizon”) prediction using quan
 
 ---
 
-## ⚡ Quick start
+## Quick start
 
 ```bash
 # 1. Clone
@@ -64,9 +65,9 @@ Results land in `multirun/{date}/{time}/results/`, including performance metrics
 
 ---
 
-## 🛠️ Configuration 101 (Hydra)
+## Config (Hydra)
 
-All experimental knobs live in `conf/`:
+All exp knobs live in `conf/`:
 
 ```yaml
 # conf/config.yaml   ← umbrella file
@@ -79,37 +80,30 @@ feature_classes: ['all']
 ...
 ```
 
-Override any field from the CLI:
+Override params from the CLI:
 
 ```bash
 python run_tsai.py max_epochs=20 
 ```
 
-## 🗃️ Datasets
+## Data
 
-We rely on **two open neonatal EEG seizure corpora** (license‑compatible):
-
-| Dataset | Subjects | Hours | Link |
-|---------|----------|-------|------|
-| HUH (Helsinki University Hospital) | 79 | 148 h | DOI in manuscript |
-| Cork University Maternity Hospital | 53 | 133 h | DOI in manuscript |
-
-Raw EDFs **not included**—please download from the source and run QEEGfeats code to generate QEEG features.
+We rely on **two open neonatal EEG seizure corpora** from Helsinki University Hospital and Cork University Maternity Hospital (DOI in manuscript). 
+Raw EDFs **not included**—please download from the source and run QEEGfeats code to generate QEEG features (https://github.com/dbernardo05/qeegfeats)
 
 ---
 
-## 🚀 Extending the project
+## Extensible
 
 * **Add a model** – drop your PyTorch backbone in `models/` and register it. The `build_ts_model` helper automatically matches input channels & output classes.  
 * **Multimodal fusion** – enable `multimodal_mode=true` to concatenate clinical tabular variables through `mixed_patch.py`.  
 * **Uncertainty quantification** – set `num_UQMC_runs>1` for MC‑dropout ensembling.  
 
-
 ---
 
-## 🤝 Acknowledgements
+## Acknowledgements
 
-We thank the Helsinki & Cork teams for open‑sourcing neonatal EEG datasets.
+We thank the Helsinki & Cork teams for open‑sourcing their neonatal EEG datasets.
 
 ---
 
