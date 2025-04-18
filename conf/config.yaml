@@ -1,0 +1,113 @@
+# conf/config.yaml
+version_base: 1.2
+
+defaults:
+  - _self_
+
+hydra:
+  job:
+    chdir: true # to save into multirun dir
+  sweeper:
+    params:
+      kfold: 0,1,2,3,4,5,6,7,8,9
+
+# your other params…
+kfold: 0
+kfolds_dir: "kfolds_all_cork_huh"
+multimodal_mode: false
+secondary_stats_mode: false
+time_mode: false
+reuse_training_objs: false
+JK_paper_mode: true
+
+preictal_duration: 15
+batch_size: 8
+max_epochs: 10
+num_UQMC_runs: 1
+ii_weight: 1.0
+
+default_lr: 1e-4
+default_patience: 3
+
+feature_classes:
+  - all
+
+archs:
+  - name: TCN
+    kwargs:
+      c_out: 2
+      layers: [25,25,25]
+      fc_dropout: 0.2
+    lr: 1e-3
+    patience: ${default_patience}
+
+  - name: ConvLSTM
+    kwargs:
+      c_out: 2
+      n_layers: 2
+      bidirectional: true
+      hidden_size: 100
+      rnn_dropout: 0
+      fc_dropout: 0.2
+    lr: 1e-3
+    patience: ${default_patience}
+
+  - name: Transformer
+    kwargs:
+      c_out: 2
+      d_model: 256
+      n_head: 4
+      d_ffn: 256
+      dropout: 0.4
+      activation: gelu
+      n_layers: 1
+    lr: 5e-5
+    patience: ${default_patience}
+
+  - name: ConvTransformer
+    kwargs:
+      c_out: 2
+      d_model: 256
+      n_head: 4
+      d_ffn: 256
+      dropout: 0.4
+      activation: gelu
+      n_layers: 1
+    lr: 5e-5
+    patience: ${default_patience}
+
+  - name: OmniScaleCNN
+    kwargs:
+      c_out: 2
+    lr: 1e-4
+    patience: ${default_patience}
+
+  - name: TST
+    kwargs:
+      c_out: 2
+      d_model: 256
+      n_heads: 4
+      d_ff: 256
+      dropout: 0.3
+      fc_dropout: 0.3
+      n_layers: 1
+    lr: 5e-4
+    patience: ${default_patience}
+
+  - name: InceptionTime
+    kwargs:
+      c_out: 2
+      nf: 64
+    lr: 5e-4
+    patience: ${default_patience}
+
+  - name: ResNet
+    kwargs:
+      c_out: 2
+    lr: 1e-3
+    patience: ${default_patience}
+
+
+logging:
+  file: errors.log
+  level: DEBUG

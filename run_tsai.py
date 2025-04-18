@@ -35,12 +35,13 @@ from sklearn.preprocessing import StandardScaler, RobustScaler, PowerTransformer
 import preproc
 from mixed_patch import *
 from run_tsai_utils import *
-from TransformerModel_modified import *
+from custom_models.TransformerModel_modified import *
 
 MODEL_REGISTRY = {
 	"TCN":             TCN,
-	"LSTMPlus":        LSTMPlus,
-	"TransformerModel":TransformerModel,
+	"ConvLSTM":        LSTMPlus,
+	"Transformer":     TransformerModel,
+	# "ConvTransformer": TransformerPlus,
 	"OmniScaleCNN":    OmniScaleCNN,
 	"TST":             TST,
 	"InceptionTime":   InceptionTime,
