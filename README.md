@@ -89,8 +89,9 @@ python run_tsai.py max_epochs=20
 ## Data
 
 We rely on **two open neonatal EEG seizure corpora** from Helsinki University Hospital and Cork University Maternity Hospital (DOI in manuscript). 
-Raw EDFs **not included**—please download from the source and run QEEGfeats code to generate QEEG features (https://github.com/dbernardo05/qeegfeats)
-
+Raw EDFs **not included**—please download from the source (links below) and run QEEGfeats code to generate QEEG features (https://github.com/dbernardo05/qeegfeats)
+* HUH - https://zenodo.org/records/4940267
+* Cork - https://zenodo.org/records/7477575
 ---
 
 ## Extensible
