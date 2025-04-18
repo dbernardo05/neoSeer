@@ -28,7 +28,7 @@ We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑a
 | `notebooks/` | Optional exploratory notebooks and calibration curves |
 
 > **Model zoo**  
-> We register classic TCN, InceptionTime, ResNet, OmniScaleCNN, TST, a custom ConvLSTM, and a lightweight transformer. Add your own by editing `MODEL_REGISTRY` in `run_tsai.py`.
+> We register classic TCN, InceptionTime, ResNet, OmniScaleCNN, TST, a custom ConvLSTM, and a lightweight transformer. Add prebuilt time-series AI (tsai) models (https://timeseriesai.github.io/tsai/) by adding models to `MODEL_REGISTRY` in `run_tsai.py`, or add your own custom models to `custom_models/` folder.
 
 ---
 
