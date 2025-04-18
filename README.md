@@ -17,14 +17,14 @@ We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑a
 
 ## Repo highlights
 
-| Folder / file | What it contains |
+| Folder / file | Contents |
 |---------------|------------------|
 | `conf/` | Hydra YAML configs (data paths, model zoo, hyper‑params) |
-| `run_tsai.py` | **Main training / evaluation script** (shown in paper) |
+| `run_tsai.py` | **Main training / eval script** |
 | `preproc.py` | Data‑wrangling & feature‑extraction helpers |
 | `mixed_patch.py` | Light wrapper for multimodal (EEG + clinical) fusion |
-| `TransformerModel_modified.py` | Re‑purposed transformer backbone for 1‑D EEG |
-| `results/` | Auto‑generated CSVs, pickled predictions, logs |
+| `results/` | Outputted metrics, predictions, logs |
+| `custom_models/` | Custom models |
 | `notebooks/` | Optional exploratory notebooks and calibration curves |
 
 > **Model zoo**  
