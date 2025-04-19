@@ -28,7 +28,7 @@ We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑a
 | `notebooks/` | Optional exploratory notebooks and calibration curves |
 
 > **Model zoo**  
-> We register classic TCN, InceptionTime, ResNet, OmniScaleCNN, TST, a custom ConvLSTM, and a lightweight transformer. Add prebuilt time-series AI (tsai) models (https://timeseriesai.github.io/tsai/) by adding models to `MODEL_REGISTRY` in `run_tsai.py`, or add your own custom models to `custom_models/` folder.
+> Temporal convolutional network (TCN), InceptionTime, ResNet, OmniScaleCNN, TST, ConvLSTM, and lightweight Transformer. Add more prebuilt time-series AI (tsai) models (https://timeseriesai.github.io/tsai/) by adding models to `MODEL_REGISTRY` in `run_tsai.py`, or add your own custom models to `custom_models/` folder.
 
 ---
 
@@ -39,7 +39,7 @@ We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑a
 git clone https://github.com/<user>/neoSeer.git
 cd neoSeer
 
-# 2. Create env (Tested on Python 3.10, PyTorch ≥ 2.2, fastai v2, tsai v0.4, Hydra 1.2)
+# 2. Create env (Tested on Python 3.10, PyTorch ≥ 2.2, fastai v2, tsai v0.3, Hydra 1.2)
 pip install -r requirements.txt
 
 # 3. Point configs to your QEEG dataset root (default is ./data)
@@ -47,17 +47,11 @@ pip install -r requirements.txt
 # 4. Generate train/valid/test splits
 python run_preproc.py
 
-# 5. To test, train a single 5‑minute‑preictal-window ConvLSTM on fold 0
-python run_tsai.py \
-  kfold=0                                \
-  archs=conv_lstm                        \
-  preictal_duration=3                    \
-  max_epochs=1
+# 5. Example usage-train a single epoch with ConvLSTM on a single k-fold
+python run_tsai.py kfold=0 archs=convLSTM preictal_duration=5 max_epochs=1
 
 # 6. For complete run:
-python run_tsai.py \         
-  -m \
-  max_epochs=10
+python run_tsai.py -m max_epochs=10
 
 ```
 
