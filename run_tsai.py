@@ -34,7 +34,7 @@ from sklearn.preprocessing import StandardScaler, RobustScaler, PowerTransformer
 # utils and patch imports
 import preproc
 from mixed_patch import *
-from run_tsai_utils import *
+from utils import *
 from custom_models.TransformerModel_modified import *
 
 MODEL_REGISTRY = {
@@ -125,7 +125,7 @@ def run(cfg: DictConfig):
 				patience    = int(arch_cfg["patience"])
 				model = build_ts_model(ArchClass, dls=dls, **arch_kwargs)
 				arch_name = model.__class__.__name__
-				print("\tarch:", arch_name)
+				logger.info("arch:", arch_name)
 				loss_func = LabelSmoothingCrossEntropyFlat(weight=class_weights, eps=0.07)
 				learn = Learner(
 					trainval_dls,
@@ -150,7 +150,7 @@ def run(cfg: DictConfig):
 				all_preds, all_test, all_y_test_actuals = [], [], []
 				for i in range(cfg.num_UQMC_runs):
 					y_preds, y_test, y_test_actuals, win_keys  = [], [], [], []
-					print("Predicting on test set...")
+					logger.info("Predicting on test set...")
 
 					# Testing test dataloader
 					for curr_X_test, curr_y_test_actual, subj_key in zip(X_test, y_test_actual, subj_keys):

@@ -12,66 +12,11 @@ def valid_feat_name(c):
 	v = v and c.split("_")[0] != "valid"
 	return v
 
-def get_ucsf_sz_df(filename, if_testing=False, df_cols=None):
-#	Original df_all_subjs_Aug2022_processed had error/bug involving subj 1319 and others where sz were not captured
-#	df_ucsf_sz_train = pd.read_pickle("data/df_all_subjs_Aug2022_processed.p")
-	df_ucsf_sz_train = pd.read_csv(filename)
-
-	# Processed means that data was time aligned to abs_time_idx
-	processed = True
-	wins_per_min = 3
-	curr_cols = df_ucsf_sz_train.columns
-
-	if df_cols is not None:
-		difference = df_cols.difference(df_ucsf_sz_train.columns)
-		print(difference) 
-
-	# if 'subject_id' in curr_cols:
-	# 	print(df_ucsf_sz_train.subject_id.unique())
-	# 	print(df_ucsf_sz_train.group.unique())
-	# 	sys.exit()
-
-	if 'abs_time_idx' not in curr_cols:
-		df_ucsf_sz_train['abs_time_idx'] = df_ucsf_sz_train['time_idx'].astype(int)
-
-	if 'subject_id' not in curr_cols:
-		df_ucsf_sz_train['subject_id'] = df_ucsf_sz_train['group'].str.split('_').str[0].astype(int)
-
-
-	df_ucsf_sz_train['subject_id'] = [str(s) for s in df_ucsf_sz_train.subject_id ]
-	# df_ucsf_sz_train['subject_id'] = [s[:4] for s in df_ucsf_sz_train.subject_id ]
-
-	print('UCSF subjs with seizures:', df_ucsf_sz_train['subject_id'].unique())
-
-	# For samples == 5
-	if if_testing:
-		subjects = []
-		for s in df_ucsf_sz_train['subject_id'].unique():
-			if s not in ['1120', '1313', '1319', '2050', '3030', '3050', '3090', '3160', '3170' '3180'] and len(s)>3:
-				if 'True' in df_ucsf_sz_train[df_ucsf_sz_train['subject_id']==s]['seizing'].unique():
-					subjects.append(s)
-					assert len(df_ucsf_sz_train[df_ucsf_sz_train['subject_id']==s]['seizing'].unique()) == 2
-		df_ucsf_sz_train = df_ucsf_sz_train[df_ucsf_sz_train['subject_id'].isin(subjects[:5])]
-	else:
-		subjects = [s for s in df_ucsf_sz_train['subject_id'].unique() if len(s)>3]
-		df_ucsf_sz_train = df_ucsf_sz_train[df_ucsf_sz_train['subject_id'].isin(subjects)]
-
-	# replace labels of buffer periods with label 1 so that loss fn will treat as interictal
-	df_ucsf_sz_train.loc[:, "preictal"] = df_ucsf_sz_train.loc[:, "preictal"].replace(-1, 0) 
-	df_ucsf_sz_train.loc[:, "seizing"] = df_ucsf_sz_train["seizing"].astype(str)
-
-	# df_ucsf_sz_train.loc[:, "abs_time_idx"] = df_ucsf_sz_train["time_idx"] 
-
-	df_ucsf_sz_train.sort_values(['subject_id', 'abs_time_idx'], ascending=[True, True], inplace=True)
-
-	print(df_ucsf_sz_train.abs_time_idx)
-	return df_ucsf_sz_train
 
 def get_huh_cork_raw_data_df():
 	load_from_save = True
 	if load_from_save:
 		df_huh_train = pd.read_csv("data/df_SWEDE_CORK_20hz_jkRev.csv")
-		wins_per_min = 3
 
 	# clean up dataframe
 
@@ -95,14 +40,10 @@ def get_huh_cork_raw_data_df():
 
 	return df_huh_train
 
-def get_huh_training_df():
-	load_from_save = True
+def get_huh_training_df(load_from_save=True):
 	if load_from_save:
-	#     df_huh_train = pd.read_csv("data/df_all_subjs_Aug2022.csv")
-		df_huh_train = pd.read_pickle("data/df_all_subjs_Aug2022_processed.p")
-		wins_per_min = 3
-
-	# clean up dataframe
+		# df_huh_train = pd.read_pickle("data/df_all_subjs_Aug2022_processed.p")
+		df_huh_train = pd.read_csv('data/huh_subjects.csv', dtype={'subject_id': str})
 
 	# replace labels of buffer periods with label 3 so that loss fn will ignore those rows
 	df_huh_train["preictal"] = df_huh_train["preictal"].replace(-1, 0) 
@@ -113,83 +54,84 @@ def get_huh_training_df():
 	print('Len df_huh_train.preictal:', len(df_huh_train))
 	df_huh_train["seizing"] = df_huh_train["seizing"].astype(str)
 
+	# Make sure only HUH subjs are included
 	HUH_subjs = [s for s in df_huh_train.subject_id.unique() if len(s)==3]
 
 	df_huh_train = df_huh_train[df_huh_train.subject_id.isin(HUH_subjs)]
 
 	return df_huh_train
 
-def get_df_ucsf_nosz():
-	time_to_EEG_df = pd.read_csv('./data/Time_to_EEG_20230813_ucsfFinal.csv')
-	time_to_EEG_df['Subject'] = time_to_EEG_df['Subject'].fillna(value=-1)
-	time_to_EEG_df['Subject'] = time_to_EEG_df['Subject'].astype(int)
+# def get_df_ucsf_nosz():
+# 	time_to_EEG_df = pd.read_csv('./data/Time_to_EEG_20230813_ucsfFinal.csv')
+# 	time_to_EEG_df['Subject'] = time_to_EEG_df['Subject'].fillna(value=-1)
+# 	time_to_EEG_df['Subject'] = time_to_EEG_df['Subject'].astype(int)
 
-	# For loading UCSF Data without seizures
-	load_from_save = True
-	if load_from_save:
-		df_nosz = pd.read_csv("data/df_master_allHIEnoSz_noTD.csv")
+# 	# For loading UCSF Data without seizures
+# 	load_from_save = True
+# 	if load_from_save:
+# 		df_nosz = pd.read_csv("data/df_master_allHIEnoSz_noTD.csv")
 
-	# repl/ce labels of buffer periods with label 3 so that loss fn will ignore those rows
-	df_nosz["preictal"] = df_nosz["preictal"].replace(-1, 0) 
-	print('Len df_nosz:', len(df_nosz))
-	# drop rows w/ seizure as well as rows where features have nans
-	# df_master_train = df_master_train[df_master_train.trust]
-	df_nosz = df_nosz.reset_index(level=0, drop=True)
-	print('Len df_nosz:', len(df_nosz))
-	df_nosz["seizing"] = df_nosz["seizing"].astype(str)
-	df_nosz["subject_id"] = df_nosz["group"].astype(str)
+# 	# repl/ce labels of buffer periods with label 3 so that loss fn will ignore those rows
+# 	df_nosz["preictal"] = df_nosz["preictal"].replace(-1, 0) 
+# 	print('Len df_nosz:', len(df_nosz))
+# 	# drop rows w/ seizure as well as rows where features have nans
+# 	# df_master_train = df_master_train[df_master_train.trust]
+# 	df_nosz = df_nosz.reset_index(level=0, drop=True)
+# 	print('Len df_nosz:', len(df_nosz))
+# 	df_nosz["seizing"] = df_nosz["seizing"].astype(str)
+# 	df_nosz["subject_id"] = df_nosz["group"].astype(str)
 
-	print(df_nosz.subject_id.unique())
-	## Apply new SND label mapping
-	df_nosz['snd_grp'] = np.zeros((len(df_nosz),))
+# 	print(df_nosz.subject_id.unique())
+# 	## Apply new SND label mapping
+# 	df_nosz['snd_grp'] = np.zeros((len(df_nosz),))
 
-	# Add abs_time_idx
-	df_nosz['snd_grp'] = np.zeros((len(df_nosz),))
-	df_nosz['abs_time_idx'] = df_nosz['time_idx'].astype(int)
+# 	# Add abs_time_idx
+# 	df_nosz['snd_grp'] = np.zeros((len(df_nosz),))
+# 	df_nosz['abs_time_idx'] = df_nosz['time_idx'].astype(int)
 
-	n = 0 
-	for grp in df_nosz["subject_id"].unique():
-		df_nosz.loc[df_nosz['subject_id'] == grp,'snd_grp'] = int(9900000 + n)
-		n+=1 
+# 	n = 0 
+# 	for grp in df_nosz["subject_id"].unique():
+# 		df_nosz.loc[df_nosz['subject_id'] == grp,'snd_grp'] = int(9900000 + n)
+# 		n+=1 
 
-	df_nosz["subject_id"] = df_nosz["subject_id"].str.slice(0,4)
+# 	df_nosz["subject_id"] = df_nosz["subject_id"].str.slice(0,4)
 
 
-	# Add postnatal_time_without_sz_lbls
+# 	# Add postnatal_time_without_sz_lbls
 
-	postnatal_age_without_sz_lbls = {}
-	print(time_to_EEG_df.Subject)
-	for name, grp in df_nosz.groupby(by='subject_id'):
-		age_corr = time_to_EEG_df[time_to_EEG_df.Subject==int(name)].Time_to_EEG.values*3 # In minutes so convert to epoch time
-		sz = np.array([1 if n == 'True' else 0 for n in grp['seizing'].values])
+# 	postnatal_age_without_sz_lbls = {}
+# 	print(time_to_EEG_df.Subject)
+# 	for name, grp in df_nosz.groupby(by='subject_id'):
+# 		age_corr = time_to_EEG_df[time_to_EEG_df.Subject==int(name)].Time_to_EEG.values*3 # In minutes so convert to epoch time
+# 		sz = np.array([1 if n == 'True' else 0 for n in grp['seizing'].values])
 
-		if np.sum(sz) == 0:
-			postnatal_time_without_sz = np.arange(len(sz)) + age_corr
-		else:
-			index_of_first_sz = np.where(sz == 1)[0][0]
-			postnatal_time_without_sz = np.zeros(len(sz))
-			postnatal_time_without_sz[:index_of_first_sz] = np.arange(index_of_first_sz) + age_corr
+# 		if np.sum(sz) == 0:
+# 			postnatal_time_without_sz = np.arange(len(sz)) + age_corr
+# 		else:
+# 			index_of_first_sz = np.where(sz == 1)[0][0]
+# 			postnatal_time_without_sz = np.zeros(len(sz))
+# 			postnatal_time_without_sz[:index_of_first_sz] = np.arange(index_of_first_sz) + age_corr
 
-		postnatal_age_without_sz_lbls[name] = postnatal_time_without_sz
+# 		postnatal_age_without_sz_lbls[name] = postnatal_time_without_sz
 
-	print(df_nosz.shape)
-	postnatal_age_lbls = {}
-	for name, grp in df_nosz.groupby(by='subject_id'):
-		len_time = len(grp)
-		age_corr = time_to_EEG_df[time_to_EEG_df.Subject==int(name)].Time_to_EEG.values*3 # In minutes so convert to epoch time
-		postnatal_age = np.arange(len_time) + age_corr
-		postnatal_age_lbls[name] = postnatal_age
+# 	print(df_nosz.shape)
+# 	postnatal_age_lbls = {}
+# 	for name, grp in df_nosz.groupby(by='subject_id'):
+# 		len_time = len(grp)
+# 		age_corr = time_to_EEG_df[time_to_EEG_df.Subject==int(name)].Time_to_EEG.values*3 # In minutes so convert to epoch time
+# 		postnatal_age = np.arange(len_time) + age_corr
+# 		postnatal_age_lbls[name] = postnatal_age
 
-	## Apply pna_szf label mapping
-	df_nosz['pna_szf'] = np.zeros((len(df_nosz),))
-	for grp, lbls in postnatal_age_without_sz_lbls.items():
-		df_nosz.loc[df_nosz['subject_id'] == grp,'pna_szf'] = lbls
+# 	## Apply pna_szf label mapping
+# 	df_nosz['pna_szf'] = np.zeros((len(df_nosz),))
+# 	for grp, lbls in postnatal_age_without_sz_lbls.items():
+# 		df_nosz.loc[df_nosz['subject_id'] == grp,'pna_szf'] = lbls
 
-	df_nosz['pna'] = np.zeros((len(df_nosz),))
-	for grp, lbls in postnatal_age_lbls.items():
-		df_nosz.loc[df_nosz['subject_id'] == grp,'pna'] = lbls
+# 	df_nosz['pna'] = np.zeros((len(df_nosz),))
+# 	for grp, lbls in postnatal_age_lbls.items():
+# 		df_nosz.loc[df_nosz['subject_id'] == grp,'pna'] = lbls
 
-	return df_nosz
+# 	return df_nosz
 
 
 def get_df_cork():
