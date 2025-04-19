@@ -125,7 +125,7 @@ def run(cfg: DictConfig):
 				patience    = int(arch_cfg["patience"])
 				model = build_ts_model(ArchClass, dls=dls, **arch_kwargs)
 				arch_name = model.__class__.__name__
-				logger.info("arch:", arch_name)
+				logger.info(f"Model: {arch_name}")
 				loss_func = LabelSmoothingCrossEntropyFlat(weight=class_weights, eps=0.07)
 				learn = Learner(
 					trainval_dls,

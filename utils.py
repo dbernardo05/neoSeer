@@ -149,8 +149,7 @@ def fetch_training_objs(kfolds_dir, kfold, resume_from_secStats, secondary_stats
 			sel_subjs = random.sample(huh_subjs, 7)
 			df_train = df_train[df_train['subject_id'].isin(sel_subjs)]
 			df_train_subjs = sel_subjs
-		print("# Total {} training subjects.".format(len(df_train_subjs)))
-		print("# \tdf_train_subjs:", df_train_subjs)
+		logger.info(f"df_train_subjs: N={len(df_train_subjs)}")
 
 		# Add clinical variables
 		clin_var_cols = []
@@ -204,11 +203,10 @@ def get_metadataloader(kfold, epoch_winlen, bs, kfolds_dir, featclass,
 									debug_mode=False,
 									AFE_mode=False):
 
-	logger.info("# Fetching training data")
+	logger.info("Fetching training data")
 	df_train, scaler, raw_data_cols, clin_var_cols = fetch_training_objs(kfolds_dir, kfold, resume_from_secStats, secondary_stats_mode, 
 																add_clinvars_mode, featclass, time_mode, reuse_training_objs, debug_mode)
-	logger.info("\tdf_train shape:", df_train.shape)
-
+	logger.info(f"df_train shape: {df_train.shape}")
 
 	# If multimodal mode, remove clinvars from data cols, after scaling completed
 	# raw_data_cols include all data_cols that require scaling
@@ -360,7 +358,8 @@ def get_metadataloader(kfold, epoch_winlen, bs, kfolds_dir, featclass,
 	valid_len = 0
 
 	df_val = get_fold_data(kfolds_dir, kfold, "valid", resume_from_secStats, secondary_stats_mode)
-	logger.info("\tdf_val shape:", df_val.shape)
+	logger.info(f"df_val shape: {df_val.shape}")
+
 	df_val = df_val.sort_values(['subject_id', 'abs_time_idx'], ascending=[True, True])
 
 	if debug_mode:
@@ -368,9 +367,8 @@ def get_metadataloader(kfold, epoch_winlen, bs, kfolds_dir, featclass,
 		huh_subjs = [s for s in df_val.subject_id if s<100]
 		sel_subjs = random.sample(huh_subjs, 3)
 		df_val = df_val[df_val['subject_id'].isin(sel_subjs)]
-	logger.info("# Total {} valid subjects.".format(len(df_val.subject_id.unique())))
-	logger.info("# Valid subjs:", df_val.subject_id.unique())
-
+	# logger.info(f"# Total {len(df_val.subject_id.unique())} valid subjects"
+	logger.info(f"Valid subjs:{df_val.subject_id.unique()}")
 
 	# Add secondary statistics
 	if secondary_stats_mode:
@@ -463,7 +461,7 @@ def get_test_dl(kfold, epoch_winlen, kfolds_dir, raw_data_cols, data_cols, clin_
 
 	df_test["unq_subj_id"] = df_test["subject_id"].astype(str) + '_' + df_test["augmentation"] + '_' + df_test["snd_grp"].astype(str)
 
-	logger.info("Test subjs:", df_test.subject_id.unique())
+	logger.info(f"Test subjs: {df_test.subject_id.unique()}")
 
 	# Estimate class imbalance
 	neg_samples = 0
