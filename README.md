@@ -13,8 +13,6 @@ Neonatal seizures carry high morbidity. Existing seizure prediction approaches p
 We tackle *static,* *minute‑scale* (“short‑horizon”) seizure prediction using quantitative EEG and DL.
 We achieve AUROC ≈ 0.80 at a 3 min SPH / 7 min SOP with modest false‑alarm rates.
 
----
-
 ## Approach and architecture at a glance
 Experiments are orchestrated with Hydra YAML configs, trained via fastai’s learner loop atop PyTorch, and draw models from tsai’s time‑series zoo (or custom). Pre‑processing, multimodal EEG + clinical fusion, and uncertainty estimation utilities sit alongside the main script. CPU, CUDA, or Apple‑silicon compatible.
 
